@@ -1,0 +1,5 @@
+// Stunner Viewer 应用资源文件
+// 定义应用程序图标
+
+// IDI_ICON1 是标准的图标资源标识符
+1 ICON "icon.ico"

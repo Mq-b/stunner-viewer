@@ -16,3 +16,4 @@ rust_xlsxwriter = "0.95"
 
 [build-dependencies]
 slint-build = "1.9"
+winres = "0.1"

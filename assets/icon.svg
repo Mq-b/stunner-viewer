@@ -1,0 +1,30 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" width="64" height="64">
+  <!-- 背景圆角矩形 -->
+  <rect x="2" y="2" width="60" height="60" rx="12" ry="12"
+        fill="#1a1a2e" stroke="#16213e" stroke-width="2"/>
+
+  <!-- 网格线（淡） -->
+  <line x1="12" y1="20" x2="52" y2="20" stroke="#2a2a4a" stroke-width="0.5"/>
+  <line x1="12" y1="32" x2="52" y2="32" stroke="#2a2a4a" stroke-width="0.5"/>
+  <line x1="12" y1="44" x2="52" y2="44" stroke="#2a2a4a" stroke-width="0.5"/>
+
+  <!-- 坐标轴 -->
+  <line x1="12" y1="16" x2="12" y2="48" stroke="#4a4a6a" stroke-width="1.5"/>
+  <line x1="12" y1="48" x2="52" y2="48" stroke="#4a4a6a" stroke-width="1.5"/>
+
+  <!-- 光谱曲线（UV-Vis 吸收峰） -->
+  <polyline points="12,44 16,42 20,38 24,30 28,22 32,18 36,20 40,28 44,36 48,40 52,42"
+            fill="none" stroke="#00d4ff" stroke-width="2.5"
+            stroke-linecap="round" stroke-linejoin="round"/>
+
+  <!-- 发光效果 -->
+  <polyline points="12,44 16,42 20,38 24,30 28,22 32,18 36,20 40,28 44,36 48,40 52,42"
+            fill="none" stroke="#00d4ff" stroke-width="4"
+            stroke-linecap="round" stroke-linejoin="round"
+            opacity="0.3"/>
+
+  <!-- 数据点 -->
+  <circle cx="28" cy="22" r="2" fill="#00d4ff"/>
+  <circle cx="32" cy="18" r="2" fill="#00d4ff"/>
+  <circle cx="36" cy="20" r="2" fill="#00d4ff"/>
+</svg>
