@@ -156,38 +156,48 @@ fn to_position_items(positions: &[MeasurementPosition]) -> ModelRc<PositionItem>
     ModelRc::new(VecModel::from(vec))
 }
 
-/// 光谱数据 → SVG Path 命令
+/// 光谱数据 → SVG Path 命令（所有光谱叠加渲染）
 ///
-/// 取第一条光谱，坐标归一化到 0-1000 范围，留出 5% 边距。
+/// 所有光谱共享同一坐标系：X 轴 190-790nm，Y 轴根据全局最大值缩放。
 fn spectrum_to_svg_path(report: &StunnerReport) -> String {
-    let Some(spec) = report.spectra.first() else {
-        return String::new();
-    };
-    if spec.values.is_empty() {
+    if report.spectra.is_empty() {
         return String::new();
     }
 
-    let x_min = spec.wavelengths.first().copied().unwrap_or(190.0);
-    let x_max = spec.wavelengths.last().copied().unwrap_or(790.0);
+    // 计算全局 X/Y 范围
+    let x_min = 190.0_f32;
+    let x_max = 790.0_f32;
     let x_range = x_max - x_min;
-    let y_min = spec.min_value();
-    let y_max = spec.max_value();
-    let y_range = if y_max > y_min { y_max - y_min } else { 1.0 };
-
-    // 缩放到 0-1000，但 Y 轴从 200 开始（顶部留 20% 边距）
-    let scale_x = 1000.0 / x_range;
+    let mut global_y_max = f32::NEG_INFINITY;
+    let mut global_y_min = f32::INFINITY;
+    for spec in &report.spectra {
+        global_y_max = global_y_max.max(spec.max_value());
+        global_y_min = global_y_min.min(spec.min_value());
+    }
+    let y_range = if global_y_max > global_y_min {
+        global_y_max - global_y_min
+    } else {
+        1.0
+    };
     let y_margin = y_range * 0.2;
+    let scale_x = 1000.0 / x_range;
 
-    let mut cmds = String::with_capacity(spec.values.len() * 20);
-    for (i, val) in spec.values.iter().enumerate() {
-        let wl = spec.wavelengths.get(i).copied().unwrap_or(x_min + i as f32);
-        let x = (wl - x_min) * scale_x;
-        // Y 轴：最大值在 200，最小值在 1000，顶部留 200 的空间
-        let y = 200.0 + (y_max - val + y_margin) / (y_range + y_margin * 2.0) * 800.0;
-        if i == 0 {
-            cmds.push_str(&format!("M {:.1} {:.1}", x, y));
-        } else {
-            cmds.push_str(&format!(" L {:.1} {:.1}", x, y));
+    // 为每条光谱生成独立的 M/L 路径
+    let mut cmds = String::new();
+    for spec in &report.spectra {
+        if spec.values.is_empty() {
+            continue;
+        }
+        for (i, val) in spec.values.iter().enumerate() {
+            let wl = spec.wavelengths.get(i).copied().unwrap_or(x_min + i as f32);
+            let x = (wl - x_min) * scale_x;
+            let y =
+                200.0 + (global_y_max - val + y_margin) / (y_range + y_margin * 2.0) * 800.0;
+            if i == 0 {
+                cmds.push_str(&format!("M {:.1} {:.1}", x, y));
+            } else {
+                cmds.push_str(&format!(" L {:.1} {:.1}", x, y));
+            }
         }
     }
     cmds

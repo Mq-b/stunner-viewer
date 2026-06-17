@@ -31,17 +31,17 @@ export component SpectrumChart inherits Rectangle {
         text: root.title;
         x: root.plot-x;
         y: 10px;
-        color: Palette.foreground;
+        color: #2c3e50;
         font-size: 12px;
         font-weight: 600;
     }
 
-    // Y 轴标签（水平显示在左上角）
+    // Y 轴标签
     if has-data : Text {
         text: root.y-axis-label;
         x: root.plot-x;
         y: 26px;
-        color: Palette.foreground.transparentize(30%);
+        color: #7f8c8d;
         font-size: 10px;
     }
 
@@ -50,28 +50,28 @@ export component SpectrumChart inherits Rectangle {
         text: root.x-axis-label;
         x: root.plot-x + root.plot-w / 2 - 30px;
         y: root.plot-y + root.plot-h + 30px;
-        color: Palette.foreground.transparentize(30%);
+        color: #7f8c8d;
         font-size: 10px;
     }
 
-    // 图表绘制区域（带内边距）
+    // 图表绘制区域
     if has-data : Rectangle {
         x: root.plot-x;
         y: root.plot-y;
         width: root.plot-w;
         height: root.plot-h;
         clip: true;
-        background: transparent;
+        background: #fafbfc;
         border-width: 1px;
-        border-color: Palette.border.transparentize(60%);
+        border-color: #dfe6e9;
         border-radius: 4px;
 
         spectrum-path := Path {
             width: parent.width;
             height: parent.height;
             commands: root.path-commands;
-            stroke-width: 2px;
-            stroke: Palette.accent-background;
+            stroke-width: 1px;
+            stroke: #2980b9;
             fill: transparent;
         }
     }
