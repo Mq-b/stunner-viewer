@@ -264,6 +264,31 @@ fn test_spectrum_wavelength_value_count_match() {
     }
 }
 
+// === 光谱数据对比测试 ===
+
+#[test]
+#[ignore] // 手动运行：cargo test --test parse_bin compare_spectra -- --ignored --nocapture
+fn compare_spectra() {
+    let files = test_bin_files();
+    if files.is_empty() {
+        eprintln!("跳过：无测试 bin 文件");
+        return;
+    }
+
+    let report = parse_one(&files[0]);
+    println!("Rust: {} 条光谱", report.spectra.len());
+    for (i, spec) in report.spectra.iter().take(10).enumerate() {
+        let first3: Vec<String> = spec.values.iter().take(3).map(|v| format!("{:.6}", v)).collect();
+        println!(
+            "  [{:3}] pos_index={:3}  count={:4}  first3=[{}]",
+            i, spec.position_index, spec.values.len(), first3.join(", ")
+        );
+    }
+    // 统计对齐
+    let total = report.spectra.len();
+    println!("共 {} 条光谱", total);
+}
+
 // === 调试：打印 TLV 条目 ===
 
 #[test]
