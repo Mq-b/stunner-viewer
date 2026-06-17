@@ -188,7 +188,7 @@ export component MainWindow inherits Window {
 
         // === 状态栏 ===
         Rectangle {
-            height: 24px;
+            height: 32px;
             background: Palette.alternate-background;
             border-width: 1px;
             border-color: Palette.border;
@@ -196,11 +196,13 @@ export component MainWindow inherits Window {
             HorizontalBox {
                 padding-left: 8px;
                 padding-right: 8px;
+                padding-top: 4px;
+                padding-bottom: 4px;
 
                 Text {
                     text: root.is-loading ? "正在加载..." : root.status-message;
                     color: Palette.foreground.transparentize(40%);
-                    font-size: 11px;
+                    font-size: 12px;
                     vertical-alignment: center;
                 }
 
@@ -209,7 +211,7 @@ export component MainWindow inherits Window {
                 Text {
                     text: root.has-data ? "数据已加载" : "";
                     color: Palette.foreground.transparentize(40%);
-                    font-size: 11px;
+                    font-size: 12px;
                     vertical-alignment: center;
                 }
             }
