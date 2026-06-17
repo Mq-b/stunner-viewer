@@ -1,0 +1,217 @@
+import { Button, VerticalBox, HorizontalBox, ScrollView, ListView, GroupBox, Palette } from "std-widgets.slint";
+import { SpectrumChart } from "spectrum-chart.slint";
+
+/// 元数据键值对
+struct MetaItem {
+    key: string,
+    value: string,
+}
+
+/// 测量位置信息
+struct PositionItem {
+    index: int,
+    name: string,
+}
+
+/// Stunner Viewer 主窗口
+export component MainWindow inherits Window {
+    title: "Stunner Viewer";
+    preferred-width: 1100px;
+    preferred-height: 700px;
+
+    // === 回调 ===
+    callback open-file-clicked();
+    callback export-xlsx-clicked();
+    callback position-selected(int);
+
+    // === 属性 ===
+    in property <string> current-filename;
+    in property <bool> has-data: current-filename != "";
+    in property <[MetaItem]> experiment-info;
+    in property <[MetaItem]> instrument-info;
+    in property <[PositionItem]> positions;
+    in property <string> spectrum-path-commands;
+    in property <string> status-message;
+    in property <bool> is-loading: false;
+
+    VerticalBox {
+        // === 工具栏 ===
+        HorizontalBox {
+            spacing: 8px;
+            padding: 4px;
+
+            Button {
+                text: "📂 打开文件";
+                primary: true;
+                clicked => { root.open-file-clicked(); }
+            }
+
+            Button {
+                text: "📊 导出 XLSX";
+                enabled: root.has-data;
+                clicked => { root.export-xlsx-clicked(); }
+            }
+
+            Rectangle { horizontal-stretch: 1; }
+
+            Text {
+                text: root.current-filename;
+                color: Palette.foreground.transparentize(30%);
+                font-size: 12px;
+                vertical-alignment: center;
+                overflow: elide;
+                horizontal-stretch: 2;
+            }
+        }
+
+        // === 主内容区 ===
+        HorizontalBox {
+            spacing: 8px;
+            horizontal-stretch: 1;
+
+            // 左侧信息面板
+            ScrollView {
+                width: 280px;
+                vertical-stretch: 1;
+
+                VerticalBox {
+                    spacing: 8px;
+                    padding: 8px;
+
+                    // 实验信息
+                    GroupBox {
+                        title: "🧪 实验信息";
+                        vertical-stretch: 0;
+
+                        VerticalBox {
+                            spacing: 4px;
+                            padding: 4px;
+
+                            for item in root.experiment-info : HorizontalBox {
+                                spacing: 8px;
+
+                                Text {
+                                    text: item.key;
+                                    color: Palette.foreground.transparentize(40%);
+                                    font-size: 11px;
+                                    horizontal-stretch: 1;
+                                    vertical-alignment: center;
+                                }
+                                Text {
+                                    text: item.value;
+                                    font-size: 11px;
+                                    font-weight: 600;
+                                    horizontal-stretch: 2;
+                                    vertical-alignment: center;
+                                    overflow: elide;
+                                }
+                            }
+                        }
+                    }
+
+                    // 仪器信息
+                    GroupBox {
+                        title: "🔬 仪器信息";
+                        vertical-stretch: 0;
+
+                        VerticalBox {
+                            spacing: 4px;
+                            padding: 4px;
+
+                            for item in root.instrument-info : HorizontalBox {
+                                spacing: 8px;
+
+                                Text {
+                                    text: item.key;
+                                    color: Palette.foreground.transparentize(40%);
+                                    font-size: 11px;
+                                    horizontal-stretch: 1;
+                                    vertical-alignment: center;
+                                }
+                                Text {
+                                    text: item.value;
+                                    font-size: 11px;
+                                    font-weight: 600;
+                                    horizontal-stretch: 2;
+                                    vertical-alignment: center;
+                                    overflow: elide;
+                                }
+                            }
+                        }
+                    }
+
+                    // 测量位置
+                    GroupBox {
+                        title: "📍 测量位置";
+                        vertical-stretch: 1;
+
+                        ListView {
+                            for pos in root.positions : Rectangle {
+                                height: 28px;
+                                background: Math.mod(pos.index, 2) == 0
+                                    ? Palette.background
+                                    : Palette.alternate-background;
+                                border-radius: 2px;
+
+                                HorizontalBox {
+                                    padding: 4px;
+                                    spacing: 8px;
+
+                                    Text {
+                                        text: pos.index;
+                                        color: Palette.foreground.transparentize(50%);
+                                        font-size: 10px;
+                                        vertical-alignment: center;
+                                        width: 30px;
+                                        horizontal-alignment: right;
+                                    }
+                                    Text {
+                                        text: pos.name;
+                                        font-size: 11px;
+                                        vertical-alignment: center;
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+
+            // 右侧图表区
+            SpectrumChart {
+                horizontal-stretch: 1;
+                vertical-stretch: 1;
+                path-commands: root.spectrum-path-commands;
+            }
+        }
+
+        // === 状态栏 ===
+        Rectangle {
+            height: 24px;
+            background: Palette.alternate-background;
+            border-width: 1px;
+            border-color: Palette.border;
+
+            HorizontalBox {
+                padding-left: 8px;
+                padding-right: 8px;
+
+                Text {
+                    text: root.is-loading ? "正在加载..." : root.status-message;
+                    color: Palette.foreground.transparentize(40%);
+                    font-size: 11px;
+                    vertical-alignment: center;
+                }
+
+                Rectangle { horizontal-stretch: 1; }
+
+                Text {
+                    text: root.has-data ? "数据已加载" : "";
+                    color: Palette.foreground.transparentize(40%);
+                    font-size: 11px;
+                    vertical-alignment: center;
+                }
+            }
+        }
+    }
+}

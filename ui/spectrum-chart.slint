@@ -1,0 +1,85 @@
+import { Palette } from "std-widgets.slint";
+
+/// 光谱折线图组件
+/// SVG 路径和刻度标签均由 Rust 计算后传入
+export component SpectrumChart inherits Rectangle {
+    /// SVG 路径命令（Rust 侧计算好的光谱曲线）
+    in property <string> path-commands;
+    /// 图表标题
+    in property <string> title: "光谱数据";
+    /// X 轴标签
+    in property <string> x-axis-label: "波长 (nm)";
+    /// Y 轴标签
+    in property <string> y-axis-label: "吸光度";
+    /// 是否有数据
+    in property <bool> has-data: path-commands != "";
+    /// 坐标区域偏移
+    property <length> plot-x: 50px;
+    property <length> plot-y: 30px;
+    property <length> plot-w: self.width - 70px;
+    property <length> plot-h: self.height - 55px;
+
+    background: Palette.background;
+    border-width: 1px;
+    border-color: Palette.border;
+    border-radius: 4px;
+    clip: true;
+
+    // 无数据提示
+    if !has-data : Text {
+        text: "请打开 .bin 文件查看光谱数据";
+        color: Palette.foreground.transparentize(50%);
+        font-size: 14px;
+        horizontal-alignment: center;
+        vertical-alignment: center;
+    }
+
+    // 图表标题
+    if has-data : Text {
+        text: root.title;
+        x: root.plot-x;
+        y: 6px;
+        color: Palette.foreground;
+        font-size: 12px;
+        font-weight: 600;
+    }
+
+    // Y 轴标签
+    if has-data : Text {
+        text: root.y-axis-label;
+        x: 2px;
+        y: root.plot-y + root.plot-h / 2 - 6px;
+        color: Palette.foreground.transparentize(30%);
+        font-size: 10px;
+        transform-rotation: -90deg;
+    }
+
+    // X 轴标签
+    if has-data : Text {
+        text: root.x-axis-label;
+        x: root.plot-x + root.plot-w / 2 - 30px;
+        y: root.plot-y + root.plot-h + 20px;
+        color: Palette.foreground.transparentize(30%);
+        font-size: 10px;
+    }
+
+    // 图表绘制区域
+    if has-data : Rectangle {
+        x: root.plot-x;
+        y: root.plot-y;
+        width: root.plot-w;
+        height: root.plot-h;
+        clip: true;
+        background: transparent;
+
+        // 光谱曲线（SVG Path）
+        spectrum-path := Path {
+            width: parent.width;
+            height: parent.height;
+            commands: root.path-commands;
+            stroke-width: 2px;
+            stroke: #4472C4;
+            fill: transparent;
+        }
+    }
+}

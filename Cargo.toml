@@ -1,0 +1,18 @@
+[package]
+name = "stunner-viewer"
+version = "0.1.0"
+edition = "2021"
+description = "Unchained Labs Stunner .bin 文件解析器与查看器"
+
+[dependencies]
+slint = "1.9"
+byteorder = "1.5"
+thiserror = "2.0"
+serde = { version = "1.0", features = ["derive"] }
+toml = "0.8"
+rfd = "0.15"
+chrono = "0.4"
+rust_xlsxwriter = "0.95"
+
+[build-dependencies]
+slint-build = "1.9"
