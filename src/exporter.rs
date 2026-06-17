@@ -153,7 +153,7 @@ pub fn export_xlsx(reports: &[StunnerReport], path: &Path) -> Result<(), AppErro
                 &format!("📈 光谱数据 (共 {} 条光谱)", total),
                 &section_fmt,
             );
-            for (spec_idx, spec) in report.spectra.iter().take(10).enumerate() {
+            for (spec_idx, spec) in report.spectra.iter().enumerate() {
                 let label = format!(
                     "光谱 #{}: 位置 {} ({} 点)",
                     spec_idx + 1,
@@ -163,8 +163,7 @@ pub fn export_xlsx(reports: &[StunnerReport], path: &Path) -> Result<(), AppErro
                 row = write_section_header(worksheet, row, &label, &section_fmt);
                 write_table_header(worksheet, row, &["波长(nm)", "吸光度"], &header_fmt);
                 row += 1;
-                let max_points = spec.values.len().min(500);
-                for i in 0..max_points {
+                for i in 0..spec.values.len() {
                     let fmt = if i % 2 == 0 { &value_fmt } else { &alt_value_fmt };
                     let wl = spec.wavelengths.get(i).copied().unwrap_or(0.0);
                     let val = spec.values.get(i).copied().unwrap_or(0.0);

@@ -31,7 +31,14 @@ fn test_bin_files() -> Vec<PathBuf> {
 /// 解析单个文件并返回报告
 fn parse_one(path: &Path) -> StunnerReport {
     let parser = StunnerParser::new();
-    parser.parse_file(path).unwrap_or_else(|e| panic!("解析失败 {}: {}", path.display(), e))
+    let report = parser.parse_file(path).unwrap_or_else(|e| panic!("解析失败 {}: {}", path.display(), e));
+    eprintln!(
+        "  {}: {} 条光谱, {} 个位置",
+        path.file_name().unwrap().to_string_lossy(),
+        report.spectra.len(),
+        report.layout.positions.len()
+    );
+    report
 }
 
 // === 元数据测试 ===

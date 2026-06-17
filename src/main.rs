@@ -1,3 +1,5 @@
+#![windows_subsystem = "windows"]
+
 //! Stunner Viewer 应用入口
 //!
 //! Slint UI 类型在此生成，回调绑定在 app.rs。
