@@ -158,7 +158,7 @@ fn to_position_items(positions: &[MeasurementPosition]) -> ModelRc<PositionItem>
 
 /// 光谱数据 → SVG Path 命令
 ///
-/// 取第一条光谱，坐标归一化到 0-1000 范围。
+/// 取第一条光谱，坐标归一化到 0-1000 范围，留出 5% 边距。
 fn spectrum_to_svg_path(report: &StunnerReport) -> String {
     let Some(spec) = report.spectra.first() else {
         return String::new();
@@ -174,14 +174,16 @@ fn spectrum_to_svg_path(report: &StunnerReport) -> String {
     let y_max = spec.max_value();
     let y_range = if y_max > y_min { y_max - y_min } else { 1.0 };
 
+    // 缩放到 0-1000，但 Y 轴从 200 开始（顶部留 20% 边距）
     let scale_x = 1000.0 / x_range;
-    let scale_y = 1000.0 / y_range;
+    let y_margin = y_range * 0.2;
 
     let mut cmds = String::with_capacity(spec.values.len() * 20);
     for (i, val) in spec.values.iter().enumerate() {
         let wl = spec.wavelengths.get(i).copied().unwrap_or(x_min + i as f32);
         let x = (wl - x_min) * scale_x;
-        let y = 1000.0 - (val - y_min) * scale_y;
+        // Y 轴：最大值在 200，最小值在 1000，顶部留 200 的空间
+        let y = 200.0 + (y_max - val + y_margin) / (y_range + y_margin * 2.0) * 800.0;
         if i == 0 {
             cmds.push_str(&format!("M {:.1} {:.1}", x, y));
         } else {
